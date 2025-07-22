@@ -17,6 +17,10 @@ print(df_realizado.columns.value_counts().sum())
 print(df_orcamento.columns.value_counts().sum())
 # realizado: 16 colunas
 # orçamento: 11 colunas 
+
+# --------------------------------------------------------------------------------------------------
+
+## Análise Inicial Base_Orcamento
 # %%
 # Analisando a distribuição de frequência da variável 'Grupo Orçamentário'
 df_orcamento['Grupo Orçamentário'].value_counts().sort_values(ascending=False).head(20)
@@ -37,26 +41,32 @@ df_orcamento['Categoria'].value_counts().sort_values(ascending=False)
 categoria_unid = df_orcamento.groupby(by='Categoria')['Unid.'].value_counts()
 pd.DataFrame(categoria_unid)
 # %%
-# Ajustando a variável Qtde. Insumo para o tipo float, para depois analisar de forma descritiva 
-df_orcamento[' Qtde. Insumo '] = df_orcamento[' Qtde. Insumo '].str.replace('.', '', regex=False)
+def conversao_coluna_str_to_float(coluna_series: pd.Series) -> pd.Series:
+    # 1. Remover o separador de milhares (o ponto '.')
+    # Usar .astype(str) para garantir que seja string antes de aplicar .str
+    coluna_limpa = coluna_series.astype(str).str.replace('.', '', regex=False)
 
-print("Após remover o separador de milhares (ponto):")
-print(df_orcamento[' Qtde. Insumo '])
+    # 2. Substituir o separador decimal (a vírgula ',') por um ponto '.'
+    coluna_limpa = coluna_limpa.str.replace(',', '.', regex=False)
 
-df_orcamento[' Qtde. Insumo '] = df_orcamento[' Qtde. Insumo '].str.replace(',', '.', regex=False)
+    # 3. Converter para numérico
+    coluna_final_numerica = pd.to_numeric(coluna_limpa, errors='coerce')
 
-print("\nApós substituir a vírgula por ponto decimal:")
-print(df_orcamento[' Qtde. Insumo '])
+    return coluna_final_numerica
 
-df_orcamento[' Qtde. Insumo '] = pd.to_numeric(df_orcamento[' Qtde. Insumo '], errors='coerce')
+# --- Aplicando a função às colunas desejadas ---
+colunas_para_converter = [' Custo Insumo ', ' Qtde. Insumo ', ' Total Orçado ']
 
-print("\nDataFrame Após Conversão Final:")
-print(df_orcamento)
-print("Dtype Final:", df_orcamento[' Qtde. Insumo '].dtype)
+for col in colunas_para_converter:
+    df_orcamento[col] = conversao_coluna_str_to_float(df_orcamento[col])
+
 # %%
 # Análise descritiva da variável ' Qtde. Insumo '
-df_orcamento[' Qtde. Insumo '].describe()
+print(df_orcamento[' Qtde. Insumo '].describe())
+print(df_orcamento[' Custo Insumo '].describe())
+print(df_orcamento[' Total Orçado '].describe())
 
+# %%
 # Histograma para análise e após iremos dividir em bins...
 plt.figure(figsize=(10, 6))
 
@@ -70,5 +80,46 @@ plt.ylabel("Frequências de Demandas")
 plt.xlim(0, 5000)
 plt.ylim(0, 800)
 plt.show()
+# %%
+# Histograma para análise e após iremos dividir em bins...
+plt.figure(figsize=(10, 6))
 
+sns.histplot(
+    x=df_orcamento[' Custo Insumo ']
+)
+plt.tight_layout()
+plt.title("Histograma de Custo")
+plt.xlabel("Faixas de Custo")
+plt.ylabel("Frequências de Custo")
+plt.xlim(0, 5000)
+plt.ylim(0, 1000)
+plt.show()
+# %%
+# Histograma para análise e após iremos dividir em bins...
+plt.figure(figsize=(10, 6))
 
+sns.histplot(
+    x=df_orcamento[' Total Orçado ']
+)
+plt.tight_layout()
+plt.title("Histograma de Total Orçado")
+plt.xlabel("Faixas de Total Orçado")
+plt.ylabel("Frequências de Total Orçado")
+plt.xlim(0, 100000)
+plt.ylim(0, 1000)
+plt.show()
+# %%
+# Boxplot das variáveis numéricas
+#sns.boxplot(
+#    x=df_orcamento[' Qtde. Insumo ',
+#                   ' Custo Insumo ',
+#                   ' Total Orçado '],
+#    data=df_orcamento,
+#    color='orange'
+#
+#)
+
+# -------------------------------------------------------------------------------------------------
+
+## Análise Inicial Base_Realizado
+# %%
