@@ -267,3 +267,26 @@ plt.title("Top 20 Fornecedores - Maior Frequência")
 plt.show()
 
 # Talvez o 42 venda concreto usinado...
+
+# %%
+fornecedores_mais_caros = df_realizado.groupby(by='Fornecedor')['categoria'].sum().sort_values(ascending=False)
+fornecedores_mais_caros
+
+plt.figure(figsize=(10, 6))
+
+sns.barplot(
+    x=fornecedores_mais_caros.values,
+    y=fornecedores_mais_caros.index,
+    color='blue'
+)
+plt.tight_layout()
+plt.title("Top Fornecedores mais caro (1° Concreto Usinado)")
+plt.show()
+
+# %%
+filtro = df_realizado['categoria'] == "Concreto Usinado"
+df_filtrado = df_realizado[filtro]
+
+print((df_filtrado['valor_total_realizado'].sum() / df_realizado['valor_total_realizado'].sum()) * 100)
+
+# Aproximadamente 28% do Custo Total Realizado se oriunda da categoria Concreto Usinado, mesmo sendo o item mais caro
