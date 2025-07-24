@@ -134,7 +134,7 @@ df_realizado.to_parquet("base_realizado.parquet", index=False)
 
 # %%
 realizado_agregado = df_realizado.groupby('descricao_item').agg(
-    qtde_realizado=('qtde_realizado', 'sum'),
+    qtde_realizado=('qtde_realizado', 'sum'),   
     valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
     valor_total_realizado=('valor_total_realizado', 'sum')
 ).reset_index()
@@ -147,9 +147,15 @@ orcamento_agregado = df_orcamento.groupby('descricao_item').agg(
 
 verificacao_calculo = pd.merge(realizado_agregado, orcamento_agregado, on='descricao_item', how='outer')
 
-verificacao_calculo['desvio_qtde'] = verificacao_calculo['qtde_realizado'] - verificacao_calculo['qtde_insumo']
-verificacao_calculo['desvio_custo_unit'] = verificacao_calculo['valor_unit_realizado'] - verificacao_calculo['custo_insumo']
-verificacao_calculo['desvio_total'] = verificacao_calculo['valor_total_realizado'] - verificacao_calculo['total_orcado']
+verificacao_calculo = verificacao_calculo.fillna(0)
+
+verificacao_calculo['desvio_qtde'] = verificacao_calculo['qtde_insumo'] - verificacao_calculo['qtde_realizado']
+verificacao_calculo['desvio_custo_unit'] = verificacao_calculo['custo_insumo'] - verificacao_calculo['valor_unit_realizado']
+verificacao_calculo['desvio_total'] = verificacao_calculo['total_orcado'] - verificacao_calculo['valor_total_realizado']
+verificacao_calculo['desvio_perc_qtde'] =  (verificacao_calculo['qtde_insumo'] - verificacao_calculo['qtde_realizado']) / verificacao_calculo['qtde_insumo']
+verificacao_calculo['desvio_perc_custo_unit'] =  (verificacao_calculo['custo_insumo'] - verificacao_calculo['valor_unit_realizado']) / verificacao_calculo['custo_insumo']
+verificacao_calculo['desvio_perc_total'] =  (verificacao_calculo['total_orcado'] - verificacao_calculo['valor_total_realizado']) / verificacao_calculo['total_orcado']
+
 
 verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
 
@@ -169,9 +175,14 @@ categoria_orcamento_agregado = df_orcamento.groupby('categoria').agg(
 
 categoria_verificacao_calculo = pd.merge(categoria_realizado_agregado, categoria_orcamento_agregado, on='categoria', how='outer')
 
-categoria_verificacao_calculo['desvio_qtde'] = categoria_verificacao_calculo['qtde_realizado'] - categoria_verificacao_calculo['qtde_insumo']
-categoria_verificacao_calculo['desvio_custo_unit'] = categoria_verificacao_calculo['valor_unit_realizado'] - categoria_verificacao_calculo['custo_insumo']
-categoria_verificacao_calculo['desvio_total'] = categoria_verificacao_calculo['valor_total_realizado'] - categoria_verificacao_calculo['total_orcado']
+categoria_verificacao_calculo = categoria_verificacao_calculo.fillna(0)
+
+categoria_verificacao_calculo['desvio_qtde'] = categoria_verificacao_calculo['qtde_insumo'] - categoria_verificacao_calculo['qtde_realizado']
+categoria_verificacao_calculo['desvio_custo_unit'] = categoria_verificacao_calculo['custo_insumo'] - categoria_verificacao_calculo['valor_unit_realizado']
+categoria_verificacao_calculo['desvio_total'] = categoria_verificacao_calculo['total_orcado'] - categoria_verificacao_calculo['valor_total_realizado']
+categoria_verificacao_calculo['desvio_perc_qtde'] =  (categoria_verificacao_calculo['qtde_insumo'] - categoria_verificacao_calculo['qtde_realizado']) / categoria_verificacao_calculo['qtde_insumo']
+categoria_verificacao_calculo['desvio_perc_custo_unit'] =  (categoria_verificacao_calculo['custo_insumo'] - categoria_verificacao_calculo['valor_unit_realizado']) / categoria_verificacao_calculo['custo_insumo']
+categoria_verificacao_calculo['desvio_perc_total'] =  (categoria_verificacao_calculo['total_orcado'] - categoria_verificacao_calculo['valor_total_realizado']) / categoria_verificacao_calculo['total_orcado']
 
 categoria_verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
 
