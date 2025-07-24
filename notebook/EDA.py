@@ -290,3 +290,58 @@ df_filtrado = df_realizado[filtro]
 print((df_filtrado['valor_total_realizado'].sum() / df_realizado['valor_total_realizado'].sum()) * 100)
 
 # Aproximadamente 28% do Custo Total Realizado se oriunda da categoria Concreto Usinado, mesmo sendo o item mais caro
+
+# %%
+# 1. Agrupar a base de Realizado por item e somar os valores
+realizado_agregado = df_realizado.groupby('descricao_item').agg(
+    qtde_realizado=('qtde_realizado', 'sum'),
+    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+    valor_total_realizado=('valor_total_realizado', 'sum')
+).reset_index()
+
+# 2. Agrupar a base de Orçamento por item e somar os valores
+orcamento_agregado = df_orcamento.groupby('descricao_item').agg(
+    qtde_insumo=('qtde_insumo', 'sum'),
+    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    total_orcado=('total_orcado', 'sum')
+).reset_index()
+
+# 3. Juntar as duas tabelas agregadas
+# Usamos um 'outer' merge para garantir que os itens que existem em apenas uma das bases sejam mantidos
+verificacao_calculo = pd.merge(realizado_agregado, orcamento_agregado, on='descricao_item', how='outer')
+
+# 4. Agora podemos calcular os desvios sobre os totais de cada item
+verificacao_calculo['desvio_qtde'] = verificacao_calculo['qtde_realizado'] - verificacao_calculo['qtde_insumo']
+verificacao_calculo['desvio_custo_unit'] = verificacao_calculo['valor_unit_realizado'] - verificacao_calculo['custo_insumo']
+verificacao_calculo['desvio_total'] = verificacao_calculo['valor_total_realizado'] - verificacao_calculo['total_orcado']
+
+# Opcional: Para verificar os itens mais relevantes
+verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
+
+# %%
+# %%
+# 1. Agrupar a base de Realizado por item e somar os valores
+categoria_realizado_agregado = df_realizado.groupby('categoria').agg(
+    qtde_realizado=('qtde_realizado', 'sum'),
+    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+    valor_total_realizado=('valor_total_realizado', 'sum')
+).reset_index()
+
+# 2. Agrupar a base de Orçamento por item e somar os valores
+categoria_orcamento_agregado = df_orcamento.groupby('categoria').agg(
+    qtde_insumo=('qtde_insumo', 'sum'),
+    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    total_orcado=('total_orcado', 'sum')
+).reset_index()
+
+# 3. Juntar as duas tabelas agregadas
+# Usamos um 'outer' merge para garantir que os itens que existem em apenas uma das bases sejam mantidos
+categoria_verificacao_calculo = pd.merge(categoria_realizado_agregado, categoria_orcamento_agregado, on='categoria', how='outer')
+
+# 4. Agora podemos calcular os desvios sobre os totais de cada item
+categoria_verificacao_calculo['desvio_qtde'] = categoria_verificacao_calculo['qtde_realizado'] - categoria_verificacao_calculo['qtde_insumo']
+categoria_verificacao_calculo['desvio_custo_unit'] = categoria_verificacao_calculo['valor_unit_realizado'] - categoria_verificacao_calculo['custo_insumo']
+categoria_verificacao_calculo['desvio_total'] = categoria_verificacao_calculo['valor_total_realizado'] - categoria_verificacao_calculo['total_orcado']
+
+# Opcional: Para verificar os itens mais relevantes
+categoria_verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
