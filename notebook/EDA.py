@@ -319,7 +319,6 @@ verificacao_calculo['desvio_total'] = verificacao_calculo['valor_total_realizado
 verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
 
 # %%
-# %%
 # 1. Agrupar a base de Realizado por item e somar os valores
 categoria_realizado_agregado = df_realizado.groupby('categoria').agg(
     qtde_realizado=('qtde_realizado', 'sum'),
@@ -345,3 +344,30 @@ categoria_verificacao_calculo['desvio_total'] = categoria_verificacao_calculo['v
 
 # Opcional: Para verificar os itens mais relevantes
 categoria_verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
+
+# %%
+# 1. Agrupar a base de Realizado por item e somar os valores
+estruturado_realizado_agregado = df_realizado.groupby('cod_estruturado').agg(
+    qtde_realizado=('qtde_realizado', 'sum'),
+    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+    valor_total_realizado=('valor_total_realizado', 'sum')
+).reset_index()
+
+# 2. Agrupar a base de Orçamento por item e somar os valores
+estruturado_orcamento_agregado = df_orcamento.groupby('cod_estruturado').agg(
+    qtde_insumo=('qtde_insumo', 'sum'),
+    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    total_orcado=('total_orcado', 'sum')
+).reset_index()
+
+# 3. Juntar as duas tabelas agregadas
+# Usamos um 'outer' merge para garantir que os itens que existem em apenas uma das bases sejam mantidos
+estruturado_agregado = pd.merge(estruturado_realizado_agregado, estruturado_orcamento_agregado, on='cod_estruturado', how='outer')
+
+# 4. Agora podemos calcular os desvios sobre os totais de cada item
+estruturado_agregado['desvio_qtde'] = estruturado_agregado['qtde_realizado'] - estruturado_agregado['qtde_insumo']
+estruturado_agregado['desvio_custo_unit'] = estruturado_agregado['valor_unit_realizado'] - estruturado_agregado['custo_insumo']
+estruturado_agregado['desvio_total'] = estruturado_agregado['valor_total_realizado'] - estruturado_agregado['total_orcado']
+
+# Opcional: Para verificar os itens mais relevantes
+estruturado_agregado.sort_values(by='desvio_total', ascending=False)
