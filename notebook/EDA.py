@@ -12,23 +12,22 @@ df_realizado = pd.read_csv("C:/case_hype/data/Base_Realizado.csv",encoding='lati
 
 # %%
 def conversao_coluna_str_to_float(coluna_series: pd.Series) -> pd.Series:
-    # 1. Remover o separador de milhares (o ponto '.')
-    # Usar .astype(str) para garantir que seja string antes de aplicar .str
     coluna_limpa = coluna_series.astype(str).str.replace('.', '', regex=False)
 
-    # 2. Substituir o separador decimal (a vírgula ',') por um ponto '.'
     coluna_limpa = coluna_limpa.str.replace(',', '.', regex=False)
 
-    # 3. Converter para numérico
     coluna_final_numerica = pd.to_numeric(coluna_limpa, errors='coerce')
 
     return coluna_final_numerica
 
-# --- Aplicando a função às colunas desejadas ---
-colunas_para_converter = [' Custo Insumo ', ' Qtde. Insumo ', ' Total Orçado ']
+orcamento_colunas_para_converter = ['custo_insumo', 'qtde_insumo', 'total_orcado']
+realizado_colunas_para_converter = ['qtde_realizado', 'valor_unit_realizado', 'valor_total_realizado']
 
-for col in colunas_para_converter:
+for col in orcamento_colunas_para_converter:
     df_orcamento[col] = conversao_coluna_str_to_float(df_orcamento[col])
+
+for col in realizado_colunas_para_converter:
+    df_realizado[col] = conversao_coluna_str_to_float(df_realizado[col])
 
 # %%
 df_orcamento = df_orcamento.rename(columns={
@@ -49,15 +48,14 @@ df_orcamento[['obra', 'cod_estruturado', 'cod_item', 'descricao_item']].nunique(
 df_orcamento[['qtde_insumo', 'custo_insumo', 'total_orcado']].head(10)
 
 # %%
-# Análise de Soma de total_orcado por categoria
-custo_p_categoria = df_orcamento.groupby(by='categoria')['total_orcado'].sum().sort_values(ascending=False)
-custo_p_categoria
+total_orcado_p_categoria = df_orcamento.groupby(by='categoria')['total_orcado'].sum().sort_values(ascending=False)
+total_orcado_p_categoria
 
 plt.figure(figsize=(10, 6))
 
 sns.barplot(
-    x=custo_p_categoria.values,
-    y=custo_p_categoria.index,
+    x=total_orcado_p_categoria.values,
+    y=total_orcado_p_categoria.index,
     color='green'
 )
 plt.tight_layout()
@@ -65,9 +63,8 @@ plt.title("Soma de Custos por Categoria")
 plt.show()
 
 # %%
-# Análise de Soma de total_orcado por grupo_orcamentario
-custo_p_grupo_orc = df_orcamento.groupby(by='grupo_orcamentario')['total_orcado'].sum().sort_values(ascending=False)
-top_20_custo_p_grupo = custo_p_grupo_orc.head(20)
+total_orcado_p_grupo_orc = df_orcamento.groupby(by='grupo_orcamentario')['total_orcado'].sum().sort_values(ascending=False)
+top_20_custo_p_grupo = total_orcado_p_grupo_orc.head(20)
 
 plt.figure(figsize=(14, 8))
 
@@ -81,15 +78,14 @@ plt.title("Top 20 Grupos Orçamentário mais Custosos")
 plt.show()
 
 # %%
-# Análise de Soma de total_orcado por descricao_item
-custo_p_item = df_orcamento.groupby(by='descricao_item')['total_orcado'].sum().sort_values(ascending=False)
-top_20_custo_p_item = custo_p_item.head(20)
+total_orcado_p_desc_item = df_orcamento.groupby(by='descricao_item')['total_orcado'].sum().sort_values(ascending=False)
+top_20_total_orcado_p_desc_item = total_orcado_p_desc_item.head(20)
 
 plt.figure(figsize=(14, 8))
 
 sns.barplot(
-    x=top_20_custo_p_item.values,
-    y=top_20_custo_p_item.index,
+    x=top_20_total_orcado_p_desc_item.values,
+    y=top_20_total_orcado_p_desc_item.index,
     color='green'
 )
 plt.tight_layout()
@@ -97,7 +93,6 @@ plt.title("Top 20 Itens mais Custosos")
 plt.show()
 
 # %%
-# Gerando Histogramas ou Box Plots para Qtde. Insumo, Custo Insumo e Total Orçado.
 plt.figure(figsize=(10, 6))
 
 sns.boxplot(
@@ -139,9 +134,9 @@ for var in variaveis:
 
 ## Base Realizado
 # %%
-colunas_para_converter_2 = [' ValorUnitRealizado ', ' Qtd Realizada ', ' ValorTotalRealizado ']
+colunas_para_converter_realizado = [' ValorUnitRealizado ', ' Qtd Realizada ', ' ValorTotalRealizado ']
 
-for col in colunas_para_converter_2:
+for col in colunas_para_converter_realizado:
     df_realizado[col] = conversao_coluna_str_to_float(df_realizado[col])
 
 df_realizado.info()
@@ -166,14 +161,14 @@ df_realizado[['qtde_realizado', 'valor_unit_realizado', 'valor_total_realizado']
 
 # %%
 # Análise de Soma de valor_total_realizado por categoria
-realizado_custo_p_categoria = df_realizado.groupby(by='categoria')['valor_total_realizado'].sum().sort_values(ascending=False)
-realizado_custo_p_categoria
+total_realizado_p_categoria = df_realizado.groupby(by='categoria')['valor_total_realizado'].sum().sort_values(ascending=False)
+total_realizado_p_categoria
 
 plt.figure(figsize=(10, 6))
 
 sns.barplot(
-    x=realizado_custo_p_categoria.values,
-    y=realizado_custo_p_categoria.index,
+    x=total_realizado_p_categoria.values,
+    y=total_realizado_p_categoria.index,
     color='green'
 )
 plt.tight_layout()
@@ -181,15 +176,14 @@ plt.title("Realizado - Soma de Custos por Categoria")
 plt.show()
 
 # %%
-# Análise de Soma de total_valor_realizado por descricao_item
-realizado_custo_p_item = df_realizado.groupby(by='descricao_item')['valor_total_realizado'].sum().sort_values(ascending=False)
-realizado_top_20_custo_p_item = realizado_custo_p_item.head(20)
+total_realizado_p_desc_item = df_realizado.groupby(by='descricao_item')['valor_total_realizado'].sum().sort_values(ascending=False)
+realizado_top_20_total_orcado_p_desc_item = total_realizado_p_desc_item.head(20)
 
 plt.figure(figsize=(14, 8))
 
 sns.barplot(
-    x=realizado_top_20_custo_p_item.values,
-    y=realizado_top_20_custo_p_item.index,
+    x=realizado_top_20_total_orcado_p_desc_item.values,
+    y=realizado_top_20_total_orcado_p_desc_item.index,
     color='green'
 )
 plt.tight_layout()
@@ -197,7 +191,6 @@ plt.title("Realizado - Top 20 Itens mais Custosos")
 plt.show()
 
 # %%
-# Gerando Histogramas ou Box Plots para qtde_realizado, total_valor_unit e valor_total_realizado.
 plt.figure(figsize=(10, 6))
 
 sns.boxplot(
@@ -292,82 +285,53 @@ print((df_filtrado['valor_total_realizado'].sum() / df_realizado['valor_total_re
 # Aproximadamente 28% do Custo Total Realizado se oriunda da categoria Concreto Usinado, mesmo sendo o item mais caro
 
 # %%
-# 1. Agrupar a base de Realizado por item e somar os valores
-realizado_agregado = df_realizado.groupby('descricao_item').agg(
+realizado_agregado_categoria = df_realizado.groupby('descricao_item').agg(
     qtde_realizado=('qtde_realizado', 'sum'),
-    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+    valor_unit_realizado=('valor_unit_realizado', 'mean'),
     valor_total_realizado=('valor_total_realizado', 'sum')
 ).reset_index()
 
-# 2. Agrupar a base de Orçamento por item e somar os valores
-orcamento_agregado = df_orcamento.groupby('descricao_item').agg(
+orcamento_agregado_item = df_orcamento.groupby('descricao_item').agg(
     qtde_insumo=('qtde_insumo', 'sum'),
-    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    custo_insumo=('custo_insumo', 'mean'), 
     total_orcado=('total_orcado', 'sum')
 ).reset_index()
 
-# 3. Juntar as duas tabelas agregadas
-# Usamos um 'outer' merge para garantir que os itens que existem em apenas uma das bases sejam mantidos
-verificacao_calculo = pd.merge(realizado_agregado, orcamento_agregado, on='descricao_item', how='outer')
+sumario_desc_item = pd.merge(realizado_agregado_categoria, orcamento_agregado_item, on='descricao_item', how='outer')
 
-# 4. Agora podemos calcular os desvios sobre os totais de cada item
-verificacao_calculo['desvio_qtde'] = verificacao_calculo['qtde_realizado'] - verificacao_calculo['qtde_insumo']
-verificacao_calculo['desvio_custo_unit'] = verificacao_calculo['valor_unit_realizado'] - verificacao_calculo['custo_insumo']
-verificacao_calculo['desvio_total'] = verificacao_calculo['valor_total_realizado'] - verificacao_calculo['total_orcado']
+sumario_desc_item['desvio_qtde'] = sumario_desc_item['qtde_realizado'] - sumario_desc_item['qtde_insumo']
+sumario_desc_item['desvio_custo_unit'] = sumario_desc_item['valor_unit_realizado'] - sumario_desc_item['custo_insumo']
+sumario_desc_item['desvio_total'] = sumario_desc_item['valor_total_realizado'] - sumario_desc_item['total_orcado']
 
-# Opcional: Para verificar os itens mais relevantes
-verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
+sumario_desc_item.sort_values(by='desvio_total', ascending=False) 
 
 # %%
-# 1. Agrupar a base de Realizado por item e somar os valores
-categoria_realizado_agregado = df_realizado.groupby('categoria').agg(
-    qtde_realizado=('qtde_realizado', 'sum'),
-    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+realizado_agregado_categoria = df_realizado.groupby('categoria').agg(
+    qtde_realizado=('qtde_realizado', 'sum'),   
+    valor_unit_realizado=('valor_unit_realizado', 'sum'), 
     valor_total_realizado=('valor_total_realizado', 'sum')
 ).reset_index()
 
-# 2. Agrupar a base de Orçamento por item e somar os valores
-categoria_orcamento_agregado = df_orcamento.groupby('categoria').agg(
+orcamento_agregado_categoria = df_orcamento.groupby('categoria').agg(
     qtde_insumo=('qtde_insumo', 'sum'),
-    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    custo_insumo=('custo_insumo', 'sum'), 
     total_orcado=('total_orcado', 'sum')
 ).reset_index()
 
-# 3. Juntar as duas tabelas agregadas
-# Usamos um 'outer' merge para garantir que os itens que existem em apenas uma das bases sejam mantidos
-categoria_verificacao_calculo = pd.merge(categoria_realizado_agregado, categoria_orcamento_agregado, on='categoria', how='outer')
+sumario_desc_categoria = pd.merge(realizado_agregado_categoria, orcamento_agregado_categoria, on='categoria', how='outer')
 
-# 4. Agora podemos calcular os desvios sobre os totais de cada item
-categoria_verificacao_calculo['desvio_qtde'] = categoria_verificacao_calculo['qtde_realizado'] - categoria_verificacao_calculo['qtde_insumo']
-categoria_verificacao_calculo['desvio_custo_unit'] = categoria_verificacao_calculo['valor_unit_realizado'] - categoria_verificacao_calculo['custo_insumo']
-categoria_verificacao_calculo['desvio_total'] = categoria_verificacao_calculo['valor_total_realizado'] - categoria_verificacao_calculo['total_orcado']
+sumario_desc_categoria = sumario_desc_categoria.fillna(0)
 
-# Opcional: Para verificar os itens mais relevantes
-categoria_verificacao_calculo.sort_values(by='desvio_total', ascending=False) 
+sumario_desc_categoria['desvio_qtde'] = sumario_desc_categoria['qtde_insumo'] - sumario_desc_categoria['qtde_realizado']
+sumario_desc_categoria['desvio_custo_unit'] = sumario_desc_categoria['custo_insumo'] - sumario_desc_categoria['valor_unit_realizado']
+sumario_desc_categoria['desvio_total'] = sumario_desc_categoria['total_orcado'] - sumario_desc_categoria['valor_total_realizado']
+sumario_desc_categoria['desvio_perc_qtde'] =  (sumario_desc_categoria['qtde_insumo'] - sumario_desc_categoria['qtde_realizado']) / sumario_desc_categoria['qtde_insumo']
+sumario_desc_categoria['desvio_perc_custo_unit'] =  (sumario_desc_categoria['custo_insumo'] - sumario_desc_categoria['valor_unit_realizado']) / sumario_desc_categoria['custo_insumo']
+sumario_desc_categoria['desvio_perc_total'] =  (sumario_desc_categoria['total_orcado'] - sumario_desc_categoria['valor_total_realizado']) / sumario_desc_categoria['total_orcado']
+
+
+sumario_desc_categoria.sort_values(by='desvio_total', ascending=False) 
 
 # %%
-# 1. Agrupar a base de Realizado por item e somar os valores
-estruturado_realizado_agregado = df_realizado.groupby('cod_estruturado').agg(
-    qtde_realizado=('qtde_realizado', 'sum'),
-    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
-    valor_total_realizado=('valor_total_realizado', 'sum')
-).reset_index()
-
-# 2. Agrupar a base de Orçamento por item e somar os valores
-estruturado_orcamento_agregado = df_orcamento.groupby('cod_estruturado').agg(
-    qtde_insumo=('qtde_insumo', 'sum'),
-    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
-    total_orcado=('total_orcado', 'sum')
-).reset_index()
-
-# 3. Juntar as duas tabelas agregadas
-# Usamos um 'outer' merge para garantir que os itens que existem em apenas uma das bases sejam mantidos
-estruturado_agregado = pd.merge(estruturado_realizado_agregado, estruturado_orcamento_agregado, on='cod_estruturado', how='outer')
-
-# 4. Agora podemos calcular os desvios sobre os totais de cada item
-estruturado_agregado['desvio_qtde'] = estruturado_agregado['qtde_realizado'] - estruturado_agregado['qtde_insumo']
-estruturado_agregado['desvio_custo_unit'] = estruturado_agregado['valor_unit_realizado'] - estruturado_agregado['custo_insumo']
-estruturado_agregado['desvio_total'] = estruturado_agregado['valor_total_realizado'] - estruturado_agregado['total_orcado']
-
-# Opcional: Para verificar os itens mais relevantes
-estruturado_agregado.sort_values(by='desvio_total', ascending=False)
+sumario_desc_item.to_parquet("sumario_descricao_item.parquet", index=False)
+sumario_desc_categoria.to_parquet("sumario_categoria.parquet", index=False)
