@@ -135,13 +135,13 @@ df_realizado.to_parquet("base_realizado.parquet", index=False)
 # %%
 realizado_agregado = df_realizado.groupby('descricao_item').agg(
     qtde_realizado=('qtde_realizado', 'sum'),   
-    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+    valor_unit_realizado=('valor_unit_realizado', 'sum'), 
     valor_total_realizado=('valor_total_realizado', 'sum')
 ).reset_index()
 
 orcamento_agregado = df_orcamento.groupby('descricao_item').agg(
     qtde_insumo=('qtde_insumo', 'sum'),
-    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    custo_insumo=('custo_insumo', 'sum'), 
     total_orcado=('total_orcado', 'sum')
 ).reset_index()
 
@@ -162,13 +162,13 @@ verificacao_calculo.sort_values(by='desvio_total', ascending=False)
 # %%
 categoria_realizado_agregado = df_realizado.groupby('categoria').agg(
     qtde_realizado=('qtde_realizado', 'sum'),
-    valor_unit_realizado=('valor_unit_realizado', 'mean'), # Usar a média para o valor unitário
+    valor_unit_realizado=('valor_unit_realizado', 'sum'), 
     valor_total_realizado=('valor_total_realizado', 'sum')
 ).reset_index()
 
 categoria_orcamento_agregado = df_orcamento.groupby('categoria').agg(
     qtde_insumo=('qtde_insumo', 'sum'),
-    custo_insumo=('custo_insumo', 'mean'), # Usar a média para o custo unitário
+    custo_insumo=('custo_insumo', 'sum'), 
     total_orcado=('total_orcado', 'sum')
 ).reset_index()
 
