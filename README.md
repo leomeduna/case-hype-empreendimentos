@@ -18,6 +18,30 @@ O repositório está organizado de forma a facilitar a compreensão e replicaç�
 * **Python**: Para a etapa de tratamento e unificação dos dados. Bibliotecas como `pandas`, `numpy` e `matplotlib.pyplot` serão amplamente utilizadas.
 * **Power BI**: Para a criação do dashboard interativo e as visualizações de dados.
 * **Git & GitHub**: Para controle de versão e hospedagem do projeto.
+ 
+## 📊 Resultados da Análise
+
+Com base na análise realizada no dashboard, foram identificados insights relevantes para a gestão de custos:
+
+- Os KPIs apontaram uma **economia de R$1.079.362** no total realizado.
+- As unidades **M3 e KG** concentraram os maiores custos, somando **R$1.963.768**.
+- Fornecedores com baixa frequência, como os de códigos **80 e 15**, apresentaram altos custos, sugerindo a necessidade de buscar alternativas mais econômicas.
+- A categoria **Elétrica – Fios e Cabos** excedeu o orçamento em **R$53.853**, enquanto **Mão de Obra de Pintura** gerou economia expressiva de **R$407.720**.
+- O **Concreto Usinado**, responsável por **28% do custo total**, e a **Locação de Equipamentos Pesados** (com apenas 15 execuções), ultrapassaram o orçamento em **R$32.377**, representando cerca de **11% do valor total**.
+- A categoria **Aço e Acessórios** teve grande representatividade em volume adquirido e peso no orçamento.
+- As categorias que extrapolaram o orçamento foram: **Concreto Usinado**, **Elétrica – Fios e Cabos** e **Locação de Equipamentos Pesados**.
+- Em termos de quantidade adquirida, **Elétrica – Fios e Cabos** e **Aço e Acessórios** também superaram o previsto.
+- Itens como **Concreto Usinado** e **Locação de Pesados**, mesmo com baixa frequência, estão entre os mais onerosos.
+
+Os **gráficos de Pareto** revelaram que cinco categorias concentram mais de **70% dos custos**, indicando a necessidade de foco estratégico nestes itens.
+
+### 📌 Recomendações:
+
+1. Revisar contratos com fornecedores que apresentaram desvios significativos de custo;
+2. Implementar um painel de controle contínuo para monitoramento de gastos;
+3. Manter foco estratégico nas categorias mais onerosas, com controle mais rigoroso sobre itens de alto custo unitário e baixa frequência.
+
+Apesar dos custos elevados em algumas categorias, o **cronograma de execução foi mantido**, evidenciando **eficiência na alocação dos recursos**.
 
 ## 🔗 Conecte-se Comigo
 
